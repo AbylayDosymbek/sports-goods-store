@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Panel</h2>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+    </nav>
+
+    <button onclick="loadAnalytics()">Load Sales by Category</button>
+
+    <pre id="result"></pre>
+  </div>
+
+  <script>
+    function loadAnalytics() {
+      fetch('http://localhost:3000/api/analytics/sales-by-category')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('result').textContent =
+            JSON.stringify(data, null, 2);
+        });
+    }
+  </script>
+</body>
+</html>

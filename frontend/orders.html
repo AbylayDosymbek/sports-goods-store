@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Orders</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Orders</h2>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+    </nav>
+
+    <ul id="orders"></ul>
+  </div>
+
+  <script>
+    fetch('http://localhost:3000/api/orders')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('orders');
+        data.forEach(o => {
+          const li = document.createElement('li');
+          li.textContent = 'Order total: $' + o.total;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
