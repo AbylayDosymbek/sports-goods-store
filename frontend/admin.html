@@ -6,28 +6,64 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <div class="container">
-    <h2>Admin Panel</h2>
+<div class="container">
+  <h2>Admin Panel</h2>
 
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
-    </nav>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="products.html">Products</a>
+    <a href="orders.html">Orders</a>
+    <a href="login.html">Login</a>
+  </nav>
 
-    <button onclick="loadAnalytics()">Load Sales by Category</button>
+  <p id="status"></p>
 
-    <pre id="result"></pre>
-  </div>
+  <button onclick="loadSalesByCategory()">Sales by Category</button>
+  <button onclick="loadTopProducts()">Top Products</button>
+  <button onclick="loadMonthlyRevenue()">Monthly Revenue</button>
 
-  <script>
-    function loadAnalytics() {
-      fetch('http://localhost:3000/api/analytics/sales-by-category')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('result').textContent =
-            JSON.stringify(data, null, 2);
-        });
+  <pre id="result"></pre>
+</div>
+
+<script>
+  const API = 'http://localhost:3000';
+
+  async function requireAdmin() {
+    const me = await fetch(API + '/api/auth/me', { credentials: 'include' }).then(r => r.json());
+    if (!me.loggedIn) {
+      document.getElementById('status').textContent = 'Please login as admin (admin/admin123) to use admin functions.';
+      return false;
     }
-  </script>
+    if (me.role !== 'admin') {
+      document.getElementById('status').textContent = 'You are logged in, but not admin.';
+      return false;
+    }
+    document.getElementById('status').textContent = `Logged in as admin (${me.username})`;
+    return true;
+  }
+
+  async function loadSalesByCategory() {
+    if (!(await requireAdmin())) return;
+    fetch(API + '/api/analytics/sales-by-category', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+  }
+
+  async function loadTopProducts() {
+    if (!(await requireAdmin())) return;
+    fetch(API + '/api/analytics/top-products?limit=5', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+  }
+
+  async function loadMonthlyRevenue() {
+    if (!(await requireAdmin())) return;
+    fetch(API + '/api/analytics/monthly-revenue', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+  }
+
+  requireAdmin();
+</script>
 </body>
 </html>
