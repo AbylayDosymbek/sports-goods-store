@@ -1,11 +1,11 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-const { app, PORT, MONGO_URL } = require('./app');
+const app = require('./app');
 
-mongoose.connect(MONGO_URL)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+        app.listen(process.env.PORT || 3000, () => {
+            console.log('API running');
+        });
     })
-    .catch((err) => {
-        console.error('MongoDB connection error:', err);
-        process.exit(1);
-    });
+    .catch(err => console.error(err));

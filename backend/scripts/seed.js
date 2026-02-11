@@ -72,6 +72,8 @@ async function main() {
 
 main().catch(async (e) => {
     console.error(e);
-    try { await mongoose.disconnect(); } catch {}
+    try {
+        await mongoose.disconnect();
+    } catch {}
     process.exit(1);
 });
