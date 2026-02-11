@@ -26,44 +26,38 @@
 </div>
 
 <script>
-  const API = 'http://localhost:3000';
+  const API = 'http://localhost:3000/api';
 
-  async function requireAdmin() {
-    const me = await fetch(API + '/api/auth/me', { credentials: 'include' }).then(r => r.json());
-    if (!me.loggedIn) {
-      document.getElementById('status').textContent = 'Please login as admin (admin/admin123) to use admin functions.';
-      return false;
-    }
-    if (me.role !== 'admin') {
-      document.getElementById('status').textContent = 'You are logged in, but not admin.';
-      return false;
-    }
-    document.getElementById('status').textContent = `Logged in as admin (${me.username})`;
-    return true;
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const token = localStorage.getItem("token");
+
+  if (!user || user.role !== "admin" || !token) location.href = "login.html";
+
+  document.getElementById('status').textContent = `Logged in as admin (${user.username || user.name || 'admin'})`;
+
+  async function apiGet(path) {
+    const res = await fetch(API + path, {
+      headers: { Authorization: "Bearer " + token }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
   }
 
   async function loadSalesByCategory() {
-    if (!(await requireAdmin())) return;
-    fetch(API + '/api/analytics/sales-by-category', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+    const data = await apiGet('/analytics/sales-by-category');
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
   }
 
   async function loadTopProducts() {
-    if (!(await requireAdmin())) return;
-    fetch(API + '/api/analytics/top-products?limit=5', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+    const data = await apiGet('/analytics/top-products?limit=5');
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
   }
 
   async function loadMonthlyRevenue() {
-    if (!(await requireAdmin())) return;
-    fetch(API + '/api/analytics/monthly-revenue', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => document.getElementById('result').textContent = JSON.stringify(data, null, 2));
+    const data = await apiGet('/analytics/monthly-revenue');
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
   }
-
-  requireAdmin();
 </script>
 </body>
 </html>
