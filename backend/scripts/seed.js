@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/sports_store';
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/sports_store';
 
 const User = require('../models/User');
 const Category = require('../models/Category');
@@ -10,7 +10,7 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(MONGO_URI);
 
     await Promise.all([
         User.deleteMany({}),
@@ -46,15 +46,15 @@ async function main() {
 
     await Order.create([
         {
-            user: customer.username,
+            user: customer._id,
             items: [
                 { product: products[0]._id, quantity: 2 },
                 { product: products[2]._id, quantity: 1 }
             ],
-            total: 2 * products[0].price + 1 * products[2].price
+            total: 2 * products[0].price + products[2].price
         },
         {
-            user: customer.username,
+            user: customer._id,
             items: [
                 { product: products[1]._id, quantity: 1 },
                 { product: products[3]._id, quantity: 1 }
@@ -74,6 +74,7 @@ main().catch(async (e) => {
     console.error(e);
     try {
         await mongoose.disconnect();
-    } catch {}
+    } catch {
+    }
     process.exit(1);
 });
