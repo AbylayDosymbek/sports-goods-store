@@ -7,7 +7,7 @@ This is a simple **web application** (backend + frontend) using **MongoDB** that
 - Aggregation endpoints (multi-stage pipelines)
 - Authentication + authorization (session-based)
 
-These points match the course final project requirements (REST API + MongoDB + CRUD + aggregation + auth, etc.). fileciteturn0file0
+These points match the course final project requirements (REST API + MongoDB + CRUD + aggregation + auth, etc.).
 
 ---
 
@@ -30,6 +30,15 @@ npm start
 
 Backend runs on:
 - http://localhost:3000
+
+### Backend environment file
+Create `backend/.env` (you can copy from `.env.example`) with:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/sports_store
+SESSION_SECRET=change-me
+PORT=3000
+```
 
 ### Frontend
 Open **frontend** folder with any static server on port **5500** (important because of CORS):
@@ -111,3 +120,32 @@ Open:
     - compound index `{ category: 1, price: 1 }`
     - text index on `name`
 - `Order` has index on `createdAt` and `{ createdAt: 1, user: 1 }`
+
+---
+
+## 7) Troubleshooting
+
+### Error: `Order validation failed: user: Cast to ObjectId failed for value "user"` during `npm run seed`
+This happens if the seed script still writes a username string to `Order.user`.
+Use the latest code where `Order.user` is seeded with `customer._id` and rerun:
+
+```bash
+cd backend
+npm run seed
+```
+
+### Error: `The uri parameter to openUri() must be a string, got "undefined"` during `npm start`
+This means Mongo connection env is missing. Create `backend/.env` from `.env.example` and set:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/sports_store
+SESSION_SECRET=change-me
+PORT=3000
+```
+
+Then run:
+
+```bash
+cd backend
+npm start
+```
